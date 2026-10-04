@@ -10,6 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedUtmRouteImport } from './routes/_authenticated/utm'
 import { Route as ApiPublicConversionsRouteImport } from './routes/api/public/conversions'
 import { Route as ApiPublicTSlugRouteImport } from './routes/api/public/t.$slug'
 
@@ -17,6 +21,25 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedUtmRoute = AuthenticatedUtmRouteImport.update({
+  id: '/utm',
+  path: '/utm',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiPublicConversionsRoute = ApiPublicConversionsRouteImport.update({
   id: '/api/public/conversions',
@@ -31,30 +54,62 @@ const ApiPublicTSlugRoute = ApiPublicTSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/utm': typeof AuthenticatedUtmRoute
   '/api/public/conversions': typeof ApiPublicConversionsRoute
   '/api/public/t/$slug': typeof ApiPublicTSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/utm': typeof AuthenticatedUtmRoute
   '/api/public/conversions': typeof ApiPublicConversionsRoute
   '/api/public/t/$slug': typeof ApiPublicTSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/utm': typeof AuthenticatedUtmRoute
   '/api/public/conversions': typeof ApiPublicConversionsRoute
   '/api/public/t/$slug': typeof ApiPublicTSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/conversions' | '/api/public/t/$slug'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/utm'
+    | '/api/public/conversions'
+    | '/api/public/t/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/conversions' | '/api/public/t/$slug'
-  id: '__root__' | '/' | '/api/public/conversions' | '/api/public/t/$slug'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/utm'
+    | '/api/public/conversions'
+    | '/api/public/t/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/utm'
+    | '/api/public/conversions'
+    | '/api/public/t/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ApiPublicConversionsRoute: typeof ApiPublicConversionsRoute
   ApiPublicTSlugRoute: typeof ApiPublicTSlugRoute
 }
@@ -67,6 +122,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/utm': {
+      id: '/_authenticated/utm'
+      path: '/utm'
+      fullPath: '/utm'
+      preLoaderRoute: typeof AuthenticatedUtmRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/conversions': {
       id: '/api/public/conversions'
@@ -85,8 +168,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedUtmRoute: typeof AuthenticatedUtmRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedUtmRoute: AuthenticatedUtmRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ApiPublicConversionsRoute: ApiPublicConversionsRoute,
   ApiPublicTSlugRoute: ApiPublicTSlugRoute,
 }
