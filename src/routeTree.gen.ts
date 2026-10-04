@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicConversionsRouteImport } from './routes/api/public/conversions'
+import { Route as ApiPublicTSlugRouteImport } from './routes/api/public/t.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicConversionsRoute = ApiPublicConversionsRouteImport.update({
+  id: '/api/public/conversions',
+  path: '/api/public/conversions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTSlugRoute = ApiPublicTSlugRouteImport.update({
+  id: '/api/public/t/$slug',
+  path: '/api/public/t/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/conversions': typeof ApiPublicConversionsRoute
+  '/api/public/t/$slug': typeof ApiPublicTSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/conversions': typeof ApiPublicConversionsRoute
+  '/api/public/t/$slug': typeof ApiPublicTSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/conversions': typeof ApiPublicConversionsRoute
+  '/api/public/t/$slug': typeof ApiPublicTSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/public/conversions' | '/api/public/t/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/public/conversions' | '/api/public/t/$slug'
+  id: '__root__' | '/' | '/api/public/conversions' | '/api/public/t/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicConversionsRoute: typeof ApiPublicConversionsRoute
+  ApiPublicTSlugRoute: typeof ApiPublicTSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/conversions': {
+      id: '/api/public/conversions'
+      path: '/api/public/conversions'
+      fullPath: '/api/public/conversions'
+      preLoaderRoute: typeof ApiPublicConversionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/t/$slug': {
+      id: '/api/public/t/$slug'
+      path: '/api/public/t/$slug'
+      fullPath: '/api/public/t/$slug'
+      preLoaderRoute: typeof ApiPublicTSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicConversionsRoute: ApiPublicConversionsRoute,
+  ApiPublicTSlugRoute: ApiPublicTSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
