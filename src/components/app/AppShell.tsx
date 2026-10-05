@@ -10,12 +10,12 @@ import { useWorkspace } from "@/lib/workspace";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
-  { to: "/campanhas", label: "Campanhas", icon: Megaphone },
+  { to: "/campaigns", label: "Campanhas", icon: Megaphone },
   { to: "/utm", label: "Gerador de UTMs", icon: Wand2 },
-  { to: "/conversoes", label: "Conversões", icon: ShoppingBag },
+  { to: "/conversions", label: "Conversões", icon: ShoppingBag },
   { to: "/links", label: "Rastreamento", icon: Link2 },
-  { to: "/integracoes", label: "Integrações", icon: Plug },
-  { to: "/configuracoes", label: "Configurações", icon: Settings },
+  { to: "/integrations", label: "Integrações", icon: Plug },
+  { to: "/settings", label: "Configurações", icon: Settings },
 ] as const;
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {

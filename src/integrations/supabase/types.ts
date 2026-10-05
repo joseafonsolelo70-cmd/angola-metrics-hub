@@ -84,6 +84,7 @@ export type Database = {
           event_name: string
           fbclid: string | null
           id: string
+          meta_capi_error: string | null
           meta_capi_status: string | null
           occurred_at: string
           product: string | null
@@ -109,6 +110,7 @@ export type Database = {
           event_name?: string
           fbclid?: string | null
           id?: string
+          meta_capi_error?: string | null
           meta_capi_status?: string | null
           occurred_at?: string
           product?: string | null
@@ -134,6 +136,7 @@ export type Database = {
           event_name?: string
           fbclid?: string | null
           id?: string
+          meta_capi_error?: string | null
           meta_capi_status?: string | null
           occurred_at?: string
           product?: string | null
@@ -247,6 +250,7 @@ export type Database = {
           pixel_id: string | null
           provider: string
           status: string
+          test_event_code: string | null
           token_last4: string | null
           updated_at: string
           workspace_id: string
@@ -259,6 +263,7 @@ export type Database = {
           pixel_id?: string | null
           provider: string
           status?: string
+          test_event_code?: string | null
           token_last4?: string | null
           updated_at?: string
           workspace_id: string
@@ -271,6 +276,7 @@ export type Database = {
           pixel_id?: string | null
           provider?: string
           status?: string
+          test_event_code?: string | null
           token_last4?: string | null
           updated_at?: string
           workspace_id?: string
@@ -461,6 +467,7 @@ export type Database = {
       }
       tracking_links: {
         Row: {
+          active: boolean
           campaign_id: string | null
           clicks: number
           created_at: string
@@ -476,6 +483,7 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          active?: boolean
           campaign_id?: string | null
           clicks?: number
           created_at?: string
@@ -491,6 +499,7 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          active?: boolean
           campaign_id?: string | null
           clicks?: number
           created_at?: string
@@ -586,6 +595,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ensure_workspace: { Args: never; Returns: string }
       is_member: { Args: { _ws: string }; Returns: boolean }
     }
     Enums: {
