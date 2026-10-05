@@ -11,9 +11,11 @@ export type Integration = Database["public"]["Tables"]["integrations"]["Row"];
 export const workspaceQuery = queryOptions({
   queryKey: ["workspace"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("workspaces").select("*").order("created_at").limit(1).maybeSingle();
+    // Garante que o utilizador tem um workspace (cria no primeiro login se faltar)
+    const { data: wsId, error: e1 } = await supabase.rpc("ensure_workspace");
+    if (e1) throw e1;
+    const { data, error } = await supabase.from("workspaces").select("*").eq("id", wsId as string).single();
     if (error) throw error;
-    if (!data) throw new Error("Nenhum workspace encontrado.");
     return data;
   },
   staleTime: 60_000,
