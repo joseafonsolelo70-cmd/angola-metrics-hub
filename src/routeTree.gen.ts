@@ -15,7 +15,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated/campaigns'
 import { Route as AuthenticatedConversionsRouteImport } from './routes/_authenticated/conversions'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedIntegrationsRouteImport } from './routes/_authenticated/integrations'
 import { Route as AuthenticatedLinksRouteImport } from './routes/_authenticated/links'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedUtmRouteImport } from './routes/_authenticated/utm'
 import { Route as ApiPublicConversionsRouteImport } from './routes/api/public/conversions'
 import { Route as ApiPublicTSlugRouteImport } from './routes/api/public/t.$slug'
@@ -50,9 +52,20 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedIntegrationsRoute =
+  AuthenticatedIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLinksRoute = AuthenticatedLinksRouteImport.update({
   id: '/links',
   path: '/links',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedUtmRoute = AuthenticatedUtmRouteImport.update({
@@ -77,7 +90,9 @@ export interface FileRoutesByFullPath {
   '/campaigns': typeof AuthenticatedCampaignsRoute
   '/conversions': typeof AuthenticatedConversionsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/integrations': typeof AuthenticatedIntegrationsRoute
   '/links': typeof AuthenticatedLinksRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/utm': typeof AuthenticatedUtmRoute
   '/api/public/conversions': typeof ApiPublicConversionsRoute
   '/api/public/t/$slug': typeof ApiPublicTSlugRoute
@@ -88,7 +103,9 @@ export interface FileRoutesByTo {
   '/campaigns': typeof AuthenticatedCampaignsRoute
   '/conversions': typeof AuthenticatedConversionsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/integrations': typeof AuthenticatedIntegrationsRoute
   '/links': typeof AuthenticatedLinksRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/utm': typeof AuthenticatedUtmRoute
   '/api/public/conversions': typeof ApiPublicConversionsRoute
   '/api/public/t/$slug': typeof ApiPublicTSlugRoute
@@ -101,7 +118,9 @@ export interface FileRoutesById {
   '/_authenticated/campaigns': typeof AuthenticatedCampaignsRoute
   '/_authenticated/conversions': typeof AuthenticatedConversionsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/integrations': typeof AuthenticatedIntegrationsRoute
   '/_authenticated/links': typeof AuthenticatedLinksRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/utm': typeof AuthenticatedUtmRoute
   '/api/public/conversions': typeof ApiPublicConversionsRoute
   '/api/public/t/$slug': typeof ApiPublicTSlugRoute
@@ -114,7 +133,9 @@ export interface FileRouteTypes {
     | '/campaigns'
     | '/conversions'
     | '/dashboard'
+    | '/integrations'
     | '/links'
+    | '/settings'
     | '/utm'
     | '/api/public/conversions'
     | '/api/public/t/$slug'
@@ -125,7 +146,9 @@ export interface FileRouteTypes {
     | '/campaigns'
     | '/conversions'
     | '/dashboard'
+    | '/integrations'
     | '/links'
+    | '/settings'
     | '/utm'
     | '/api/public/conversions'
     | '/api/public/t/$slug'
@@ -137,7 +160,9 @@ export interface FileRouteTypes {
     | '/_authenticated/campaigns'
     | '/_authenticated/conversions'
     | '/_authenticated/dashboard'
+    | '/_authenticated/integrations'
     | '/_authenticated/links'
+    | '/_authenticated/settings'
     | '/_authenticated/utm'
     | '/api/public/conversions'
     | '/api/public/t/$slug'
@@ -195,11 +220,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/integrations': {
+      id: '/_authenticated/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof AuthenticatedIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/links': {
       id: '/_authenticated/links'
       path: '/links'
       fullPath: '/links'
       preLoaderRoute: typeof AuthenticatedLinksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/utm': {
@@ -230,7 +269,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRoute
   AuthenticatedConversionsRoute: typeof AuthenticatedConversionsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
   AuthenticatedLinksRoute: typeof AuthenticatedLinksRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedUtmRoute: typeof AuthenticatedUtmRoute
 }
 
@@ -238,7 +279,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCampaignsRoute: AuthenticatedCampaignsRoute,
   AuthenticatedConversionsRoute: AuthenticatedConversionsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedIntegrationsRoute: AuthenticatedIntegrationsRoute,
   AuthenticatedLinksRoute: AuthenticatedLinksRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedUtmRoute: AuthenticatedUtmRoute,
 }
 
