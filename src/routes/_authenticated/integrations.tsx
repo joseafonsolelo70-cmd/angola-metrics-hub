@@ -50,7 +50,7 @@ function IntegrationsPage() {
   return (
     <>
       <PageHeader title="Integrações" description="Envie vendas aprovadas para a Meta via Conversions API." />
-      <Panel title="Meta — Pixel e Conversions API" actions={<StatusBadge status={i?.status ?? "not_configured"} label={ST[i?.status ?? "not_configured"]} />}>
+      <Panel title="Meta — Pixel e Conversions API" actions={<StatusBadge status={i?.status ?? "not_configured"} label={ST[i?.status ?? "not_configured"] ?? "—"} />}>
         {integ.isLoading ? <LoadingRows n={3} /> : (
           <form className="grid max-w-xl gap-4" onSubmit={(e) => { e.preventDefault(); save.mutate(); }}>
             <div className="space-y-1.5"><Label htmlFor="px">Pixel ID</Label><Input id="px" inputMode="numeric" value={pixel} onChange={(e) => setPixel(e.target.value)} /></div>

@@ -79,7 +79,7 @@ function CampaignsPage() {
                 <tr key={c.id} className="border-t">
                   <td className="py-2.5 pr-4"><p className="font-medium">{c.name}</p>{c.product && <p className="text-xs text-muted-foreground">{c.product}</p>}</td>
                   <td className="pr-4">{PLATFORM_LABEL[c.platform]}</td>
-                  <td className="pr-4"><StatusBadge status={c.status} label={STATUS_LABEL[c.status]} /></td>
+                  <td className="pr-4"><StatusBadge status={c.status} label={STATUS_LABEL[c.status] ?? c.status} /></td>
                   <td className="pr-4">{kz(c.budget)}</td><td className="pr-4">{kz(c.spend)}</td>
                   <td className="pr-4 font-mono text-xs">{c.utm_campaign ?? "—"}</td>
                   <td className="whitespace-nowrap text-right">

@@ -130,7 +130,7 @@ function Dashboard() {
                 {byCampaign.map((c) => (
                   <tr key={c.id} className="border-t">
                     <td className="py-2.5 pr-4 font-medium">{c.name}</td><td className="pr-4">{PLATFORM_LABEL[c.platform]}</td>
-                    <td className="pr-4"><StatusBadge status={c.status} label={STATUS_LABEL[c.status]} /></td>
+                    <td className="pr-4"><StatusBadge status={c.status} label={STATUS_LABEL[c.status] ?? c.status} /></td>
                     <td className="pr-4">{kz(c.spend)}</td><td className="pr-4">{num(c.clicks)}</td><td className="pr-4">{c.sales}</td>
                     <td className="pr-4">{kz(c.revenue)}</td><td>{ratio(Number(c.spend) ? c.revenue / Number(c.spend) : null)}</td>
                   </tr>
