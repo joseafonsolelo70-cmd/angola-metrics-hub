@@ -32,9 +32,9 @@ export function buildDemo(days: number) {
       const cl = Math.round(s / (90 + r() * 60));
       c.spend += s; spend += s; clicks += cl;
       clicksByCampaign[c.id] = (clicksByCampaign[c.id] ?? 0) + cl;
-      const sales = Math.floor(cl * (0.01 + weight[i] * 0.05) + r() * 1.2);
+      const sales = Math.floor(cl * (0.01 + (weight[i] ?? 0.1) * 0.05) + r() * 1.2);
       for (let k = 0; k < sales; k++) {
-        const v = prices[c.product!];
+        const v = prices[c.product ?? ""] ?? 20000;
         revenue += v;
         const hasFb = c.platform === "meta";
         conversions.push({
@@ -43,7 +43,7 @@ export function buildDemo(days: number) {
           product: c.product, status: "approved", source: c.platform === "other" ? "outro" : c.platform,
           fbclid: hasFb ? `IwAR${Math.floor(r() * 1e9).toString(36)}` : null,
           utm_source: c.utm_source, utm_medium: c.utm_medium, utm_campaign: c.utm_campaign, utm_content: null, utm_term: null,
-          attribution_method: r() > 0.3 ? "session_id" : "last_touch", attribution_path: [], meta_capi_status: null,
+          attribution_method: r() > 0.3 ? "session_id" : "last_touch", attribution_path: [], meta_capi_status: null, meta_capi_error: null,
           occurred_at: new Date(day.getTime() - r() * 864e5 * 0.9).toISOString(), created_at: day.toISOString(),
         });
       }
@@ -52,8 +52,10 @@ export function buildDemo(days: number) {
   }
   // Algumas vendas sem tracking: não atribuídas
   for (let k = 0; k < Math.max(2, Math.floor(days / 6)); k++) {
+    const first = conversions[0];
+    if (!first) break;
     conversions.push({
-      ...conversions[0], id: `du${k}`, campaign_id: null, session_id: null, fbclid: null, source: "direto",
+      ...first, id: `du${k}`, campaign_id: null, session_id: null, fbclid: null, source: "direto",
       utm_source: null, utm_medium: null, utm_campaign: null, attribution_method: "unattributed",
       transaction_id: `DEMO-U${k}`, occurred_at: new Date(now - r() * days * 864e5).toISOString(),
     });

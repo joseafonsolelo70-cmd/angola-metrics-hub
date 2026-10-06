@@ -68,15 +68,16 @@ export const Route = createFileRoute("/api/public/conversions")({
         // Meta Conversions API (apenas se configurada e com evento Purchase ativo)
         const { data: integ } = await db.from("integrations").select("*").eq("workspace_id", ws.id).eq("provider", "meta").maybeSingle();
         let meta: string | null = null;
+        let metaErr: string | null = null;
         if (integ?.pixel_id && integ.status === "connected" && integ.events.includes("Purchase") && p.status === "approved") {
           const { data: sec } = await db.from("integration_secrets").select("access_token").eq("integration_id", integ.id).maybeSingle();
           if (sec) {
             const r = await sendMetaPurchase({ pixelId: integ.pixel_id, token: sec.access_token, eventId: p.event_id ?? p.transaction_id, value: p.value, currency: p.currency.toUpperCase(), fbclid, eventTime: Math.floor(new Date(occurred_at).getTime() / 1000), product: p.product });
             meta = r.ok ? "sent" : "error";
-            if (!r.ok) console.error("Meta CAPI", r.body);
-          }
+            if (!r.ok) { metaErr = r.body; console.error("Meta CAPI", r.body); }
+          } else { meta = "error"; metaErr = "Token da Conversions API em falta"; }
         }
-        if (meta) await db.from("conversions").update({ meta_capi_status: meta }).eq("id", conv.id);
+        if (meta) await db.from("conversions").update({ meta_capi_status: meta, meta_capi_error: metaErr }).eq("id", conv.id);
         return json({ ok: true, id: conv.id, attribution: a.method, source, meta_capi: meta ?? "skipped" }, 201);
       },
     },

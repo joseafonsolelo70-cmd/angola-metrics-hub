@@ -78,7 +78,8 @@ export async function sendMetaPurchase(opts: {
 }) {
   const user_data: Record<string, string> = {};
   if (opts.fbclid) user_data.fbc = `fb.1.${opts.eventTime * 1000}.${opts.fbclid}`;
-  const res = await fetch(`https://graph.facebook.com/v19.0/${encodeURIComponent(opts.pixelId)}/events?access_token=${encodeURIComponent(opts.token)}`, {
+  let res: Response;
+  try { res = await fetch(`https://graph.facebook.com/v19.0/${encodeURIComponent(opts.pixelId)}/events?access_token=${encodeURIComponent(opts.token)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -87,7 +88,11 @@ export async function sendMetaPurchase(opts: {
         custom_data: { currency: opts.currency, value: opts.value, content_name: opts.product ?? undefined },
       }],
     }),
-  });
+  }); } catch (e) { return { ok: false, body: `Falha de rede: ${safeSendError(e)}` }; }
   const body = await res.text();
   return { ok: res.ok, body: body.slice(0, 500) };
+}
+
+export function safeSendError(e: unknown) {
+  return e instanceof Error ? e.message.slice(0, 300) : "Erro desconhecido";
 }

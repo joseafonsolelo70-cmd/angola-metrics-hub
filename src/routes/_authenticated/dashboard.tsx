@@ -4,7 +4,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, Res
 import { PageHeader, Panel, DemoBanner, StatusBadge, LoadingRows } from "@/components/app/ui";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useCampaigns, useConversions, useSessionsCount, useWorkspace } from "@/lib/workspace";
+import { useCampaigns, useConversions, useDailyMetrics, useSessionsCount, useWorkspace } from "@/lib/workspace";
 import { buildDemo } from "@/lib/demo";
 import { kz, num, ratio, shortDate, PLATFORM_LABEL, STATUS_LABEL } from "@/lib/format";
 
@@ -22,6 +22,7 @@ function Dashboard() {
   const camps = useCampaigns(ws?.id);
   const convs = useConversions(ws?.id, since);
   const sess = useSessionsCount(ws?.id, since);
+  const metrics = useDailyMetrics(ws?.id, since.slice(0, 10));
   const hasReal = (camps.data?.length ?? 0) > 0 || (convs.data?.length ?? 0) > 0;
   const [forceDemo, setForceDemo] = useState(false);
   const demo = forceDemo || (!camps.isLoading && !hasReal);
@@ -29,7 +30,9 @@ function Dashboard() {
   const model = useMemo(() => {
     if (demo) {
       const d = buildDemo(days);
-      return { campaigns: d.campaigns, conversions: d.conversions, clicksBy: d.clicksByCampaign, timeline: d.daily };
+      const spendBy: Record<string, number> = {};
+      d.campaigns.forEach((c) => (spendBy[c.id] = Number(c.spend)));
+      return { campaigns: d.campaigns, conversions: d.conversions, clicksBy: d.clicksByCampaign, spendBy, timeline: d.daily };
     }
     const campaigns = camps.data ?? [];
     const conversions = (convs.data ?? []).filter((c) => c.status === "approved");
@@ -37,13 +40,18 @@ function Dashboard() {
     (sess.data ?? []).forEach((s) => { if (s.campaign_id) clicksBy[s.campaign_id] = (clicksBy[s.campaign_id] ?? 0) + 1; });
     const map: Record<string, { day: string; spend: number; revenue: number; clicks: number }> = {};
     for (let i = days - 1; i >= 0; i--) { const k = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10); map[k] = { day: k, spend: 0, revenue: 0, clicks: 0 }; }
-    conversions.forEach((c) => { const k = c.occurred_at.slice(0, 10); if (map[k]) map[k].revenue += Number(c.value); });
-    const totalSpend = campaigns.reduce((a, c) => a + Number(c.spend), 0);
-    Object.values(map).forEach((m) => (m.spend = totalSpend / days));
-    return { campaigns, conversions, clicksBy, timeline: Object.values(map) };
-  }, [demo, days, camps.data, convs.data, sess.data]);
+    (sess.data ?? []).forEach((s) => { const m = map[s.created_at.slice(0, 10)]; if (m) m.clicks += 1; });
+    conversions.forEach((c) => { const m = map[c.occurred_at.slice(0, 10)]; if (m) m.revenue += Number(c.value); });
+    // Investimento real: apenas o registado dia a dia (daily_metrics), nunca estimado
+    const spendBy: Record<string, number> = {};
+    (metrics.data ?? []).forEach((d) => {
+      const m = map[d.day]; if (m) m.spend += Number(d.spend);
+      if (d.campaign_id) spendBy[d.campaign_id] = (spendBy[d.campaign_id] ?? 0) + Number(d.spend);
+    });
+    return { campaigns, conversions, clicksBy, spendBy, timeline: Object.values(map) };
+  }, [demo, days, camps.data, convs.data, sess.data, metrics.data]);
 
-  const spend = model.campaigns.reduce((a, c) => a + Number(c.spend), 0);
+  const spend = demo ? model.timeline.reduce((a, d) => a + d.spend, 0) : (metrics.data ?? []).reduce((a, d) => a + Number(d.spend), 0);
   const revenue = model.conversions.reduce((a, c) => a + Number(c.value), 0);
   const clicks = Object.values(model.clicksBy).reduce((a, b) => a + b, 0);
   const attributed = model.conversions.filter((c) => c.attribution_method !== "unattributed");
@@ -55,7 +63,7 @@ function Dashboard() {
   const byCampaign = model.campaigns.map((c) => {
     const cv = model.conversions.filter((x) => x.campaign_id === c.id);
     const rev = cv.reduce((a, x) => a + Number(x.value), 0);
-    return { ...c, sales: cv.length, revenue: rev, clicks: model.clicksBy[c.id] ?? 0 };
+    return { ...c, spend: model.spendBy[c.id] ?? 0, sales: cv.length, revenue: rev, clicks: model.clicksBy[c.id] ?? 0 };
   });
   const bySource = Object.entries(model.conversions.reduce<Record<string, number>>((a, c) => { const k = c.source ?? "direto"; a[k] = (a[k] ?? 0) + 1; return a; }, {})).map(([name, value]) => ({ name, value }));
 
@@ -68,6 +76,7 @@ function Dashboard() {
             <SelectContent>{[7, 14, 30, 90].map((d) => <SelectItem key={d} value={String(d)}>Últimos {d} dias</SelectItem>)}</SelectContent>
           </Select>
         } />
+      {!demo && <p className="mb-4 text-xs text-muted-foreground">Dados reais do workspace. Investimento = valores registados por dia em Campanhas → “Investimento diário”. Cliques = cliques rastreados pelos seus links.</p>}
       {demo && <DemoBanner>{hasReal && <span className="text-xs">A ver demonstração</span>}</DemoBanner>}
       {hasReal && <label className="mb-4 flex items-center gap-2 text-sm text-muted-foreground"><Switch checked={forceDemo} onCheckedChange={setForceDemo} /> Mostrar dados de demonstração</label>}
       {camps.isLoading ? <LoadingRows n={6} /> : (
@@ -130,7 +139,7 @@ function Dashboard() {
                 {byCampaign.map((c) => (
                   <tr key={c.id} className="border-t">
                     <td className="py-2.5 pr-4 font-medium">{c.name}</td><td className="pr-4">{PLATFORM_LABEL[c.platform]}</td>
-                    <td className="pr-4"><StatusBadge status={c.status} label={STATUS_LABEL[c.status]} /></td>
+                    <td className="pr-4"><StatusBadge status={c.status} label={STATUS_LABEL[c.status] ?? c.status} /></td>
                     <td className="pr-4">{kz(c.spend)}</td><td className="pr-4">{num(c.clicks)}</td><td className="pr-4">{c.sales}</td>
                     <td className="pr-4">{kz(c.revenue)}</td><td>{ratio(Number(c.spend) ? c.revenue / Number(c.spend) : null)}</td>
                   </tr>
