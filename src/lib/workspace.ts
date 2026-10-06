@@ -64,3 +64,19 @@ export function useSessionsCount(wsId?: string, sinceIso?: string) {
     },
   });
 }
+
+export type DailyMetric = Database["public"]["Tables"]["daily_metrics"]["Row"];
+
+export function useDailyMetrics(wsId?: string, sinceDay?: string) {
+  return useQuery({
+    queryKey: ["daily_metrics", wsId, sinceDay],
+    enabled: !!wsId,
+    queryFn: async () => {
+      let q = supabase.from("daily_metrics").select("*").eq("workspace_id", wsId!).order("day", { ascending: false }).limit(5000);
+      if (sinceDay) q = q.gte("day", sinceDay);
+      const { data, error } = await q;
+      if (error) throw error;
+      return data;
+    },
+  });
+}
