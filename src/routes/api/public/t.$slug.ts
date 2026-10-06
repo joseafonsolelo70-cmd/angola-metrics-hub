@@ -37,7 +37,7 @@ export const Route = createFileRoute("/api/public/t/$slug")({
 
         const session = reused ?? created;
         if (created) {
-          await supabaseAdmin.from("tracking_events").insert({ workspace_id: link.workspace_id, session_id: session.id, event_name: "CLICK", payload: { slug } });
+          await supabaseAdmin.from("tracking_events").insert({ workspace_id: link.workspace_id, session_id: created.id, event_name: "CLICK", payload: { slug } });
           await supabaseAdmin.from("tracking_links").update({ clicks: link.clicks + 1 }).eq("id", link.id);
         }
 
