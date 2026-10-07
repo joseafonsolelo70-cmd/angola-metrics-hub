@@ -18,11 +18,11 @@ export const saveMetaIntegration = createServerFn({ method: "POST" })
     const { data: isMember } = await context.supabase.rpc("is_member", { _ws: data.workspace_id });
     if (!isMember) throw new Error("Sem permissão");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: Record<string, unknown> = { workspace_id: data.workspace_id, provider: "meta", pixel_id: data.pixel_id, events: data.events, updated_at: new Date().toISOString() };
+    type Patch = { workspace_id: string; provider: string; pixel_id: string; events: string[]; updated_at: string; status: string; token_last4?: string; last_error?: string | null };
+    const patch: Patch = { workspace_id: data.workspace_id, provider: "meta", pixel_id: data.pixel_id, events: data.events, updated_at: new Date().toISOString(), status: "pending_test" };
     // Qualquer alteração exige novo teste antes de voltar a "Ligado"
-    patch.status = "pending_test";
     if (data.access_token) { patch.token_last4 = data.access_token.slice(-4); patch.status = "pending_test"; patch.last_error = null; }
-    const { data: integ, error } = await supabaseAdmin.from("integrations").upsert(patch as never, { onConflict: "workspace_id,provider" }).select("id, token_last4").single();
+    const { data: integ, error } = await supabaseAdmin.from("integrations").upsert(patch, { onConflict: "workspace_id,provider" }).select("id, token_last4").single();
     if (error) throw new Error(error.message);
     if (data.access_token) {
       await supabaseAdmin.from("integration_secrets").upsert({ integration_id: integ.id, access_token: data.access_token });

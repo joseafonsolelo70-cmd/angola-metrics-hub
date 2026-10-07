@@ -30,13 +30,13 @@ function LinksPage() {
     queryKey: ["links", ws?.id], enabled: !!ws,
     queryFn: async () => { const { data, error } = await supabase.from("tracking_links").select("*").eq("workspace_id", ws!.id).order("created_at", { ascending: false }); if (error) throw error; return data; },
   });
-  const [edit, setEdit] = useState<{ id?: string; form: Form } | null>(null);
+  const [edit, setEdit] = useState<{ id?: string | undefined; form: Form } | null>(null);
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const linkUrl = (slug: string) => `${origin}/api/public/t/${slug}`;
   const inval = () => qc.invalidateQueries({ queryKey: ["links"] });
 
   const save = useMutation({
-    mutationFn: async ({ id, form }: { id?: string; form: Form }) => {
+    mutationFn: async ({ id, form }: { id?: string | undefined; form: Form }) => {
       let url: URL; try { url = new URL(form.destination_url.trim()); } catch { throw new Error("URL de destino inválida (inclua https://)."); }
       if (!/^https?:$/.test(url.protocol)) throw new Error("Use um URL http(s).");
       const slug = form.slug.trim().toLowerCase();
