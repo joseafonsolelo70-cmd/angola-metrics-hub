@@ -17,7 +17,9 @@ export const Route = createFileRoute("/api/public/t/$slug")({
         const url = new URL(request.url);
         const q = url.searchParams;
         const utms = Object.fromEntries(UTM.map((k) => [k, clip(q.get(k)) ?? link[k]])) as Record<(typeof UTM)[number], string | null>;
-        const dest = new URL(link.destination_url);
+        let dest: URL;
+        try { dest = new URL(link.destination_url); } catch { return new Response("Destino inválido", { status: 422 }); }
+        if (dest.protocol !== "https:" && dest.protocol !== "http:") return new Response("Destino inválido", { status: 422 });
 
         // Dedupe: o mesmo browser no mesmo link dentro de 30 min reutiliza a sessão (cookie, sem IP)
         const cookieName = `utmify_s_${link.id.slice(0, 8)}`;

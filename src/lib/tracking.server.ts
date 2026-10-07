@@ -6,7 +6,8 @@ type Session = Database["public"]["Tables"]["sessions"]["Row"];
 
 const META = ["facebook", "fb", "instagram", "ig", "meta"];
 
-export function deriveSource(p: { fbclid?: string | null; gclid?: string | null; ttclid?: string | null; utm_source?: string | null }) {
+type Opt = string | null | undefined;
+export function deriveSource(p: { fbclid?: Opt; gclid?: Opt; ttclid?: Opt; utm_source?: Opt }) {
   const s = (p.utm_source ?? "").toLowerCase();
   if (p.fbclid || META.includes(s)) return "meta";
   if (p.gclid || s === "google") return "google";
@@ -23,15 +24,15 @@ export function detectDevice(ua: string) {
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface AttributionInput {
-  session_id?: string | null;
-  fbclid?: string | null;
-  gclid?: string | null;
-  ttclid?: string | null;
-  utm_source?: string | null;
-  utm_medium?: string | null;
-  utm_campaign?: string | null;
-  utm_content?: string | null;
-  utm_term?: string | null;
+  session_id?: Opt;
+  fbclid?: Opt;
+  gclid?: Opt;
+  ttclid?: Opt;
+  utm_source?: Opt;
+  utm_medium?: Opt;
+  utm_campaign?: Opt;
+  utm_content?: Opt;
+  utm_term?: Opt;
   occurred_at: string;
 }
 
@@ -74,9 +75,9 @@ export async function attribute(db: DB, ws: Database["public"]["Tables"]["worksp
 }
 
 export async function sendMetaPurchase(opts: {
-  pixelId: string; token: string; eventId: string; value: number; currency: string; fbclid?: string | null; eventTime: number; product?: string | null;
+  pixelId: string; token: string; eventId: string; value: number; currency: string; fbclid?: Opt; eventTime: number; product?: Opt;
 }) {
-  const user_data: Record<string, string> = {};
+  const user_data: { fbc?: string } = {};
   if (opts.fbclid) user_data.fbc = `fb.1.${opts.eventTime * 1000}.${opts.fbclid}`;
   let res: Response;
   try { res = await fetch(`https://graph.facebook.com/v19.0/${encodeURIComponent(opts.pixelId)}/events?access_token=${encodeURIComponent(opts.token)}`, {
