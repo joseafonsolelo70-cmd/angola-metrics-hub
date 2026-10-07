@@ -77,7 +77,7 @@ function LinksPage() {
               {links.data.map((l) => (
                 <tr key={l.id} className="border-t align-top">
                   <td className="py-2.5 pr-4">
-                    <p className="font-medium">{l.name} {!l.active && <StatusBadge status="paused" label="Inativo" />}</p>
+                    <div className="font-medium">{l.name} {!l.active && <StatusBadge status="paused" label="Inativo" />}</div>
                     <p className="font-mono text-xs text-muted-foreground">{linkUrl(l.slug)}</p>
                     <p className="max-w-md truncate text-xs text-muted-foreground">→ {l.destination_url}</p>
                     <div className="mt-1.5"><CopyButton value={linkUrl(l.slug)} label="Copiar link" /></div>
