@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Keep tsconfig strict flags (exactOptionalPropertyTypes, noPropertyAccessFromIndexSignature) on; fix code instead of loosening them — they catch real null/undefined bugs.
